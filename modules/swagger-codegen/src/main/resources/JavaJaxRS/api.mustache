@@ -29,6 +29,10 @@ import javax.ws.rs.*;
 {{#useBeanValidation}}
 import javax.validation.constraints.*;
 {{/useBeanValidation}}
+{{#springInjectApiService}}
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+{{/springInjectApiService}}
 
 @Path("{{contextPath}}/{{{baseName}}}")
 {{#hasConsumes}}@Consumes({ {{#consumes}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/consumes}} }){{/hasConsumes}}
@@ -36,10 +40,13 @@ import javax.validation.constraints.*;
 {{^disableApiModelAnnotations}}@io.swagger.annotations.Api(description = "the {{{baseName}}} API"){{/disableApiModelAnnotations}}
 {{>generatedAnnotation}}
 {{#operations}}
+{{#springInjectApiService}}@Component{{/springInjectApiService}}
 public class {{classname}}  {
-   private final {{classname}}Service delegate;
+   {{#springInjectApiService}}@Autowired{{/springInjectApiService}}
+   private {{^springInjectApiService}}final {{/springInjectApiService}}{{classname}}Service delegate;
 
    public {{classname}}(@Context ServletConfig servletContext) {
+{{^springInjectApiService}}
       {{classname}}Service delegate = null;
 
       if (servletContext != null) {
@@ -58,6 +65,7 @@ public class {{classname}}  {
       }
 
       this.delegate = delegate;
+{{/springInjectApiService}}
    }
 
 {{#operation}}

@@ -19,8 +19,10 @@ public class JavaJerseyServerCodegen extends AbstractJavaJAXRSServerCodegen {
      */
     public static final String DEFAULT_LIBRARY = LIBRARY_JERSEY2;
     public static final String USE_TAGS = "useTags";
+    public static final String SPRING_INJECT_API_SERVICE = "springInjectApiService";
 
     protected boolean useTags = false;
+    protected boolean springInjectApiService = false;
 
     public JavaJerseyServerCodegen() {
         super();
@@ -50,6 +52,7 @@ public class JavaJerseyServerCodegen extends AbstractJavaJAXRSServerCodegen {
         cliOptions.add(library);
         cliOptions.add(CliOption.newBoolean(SUPPORT_JAVA6, "Whether to support Java6 with the Jersey1/2 library."));
         cliOptions.add(CliOption.newBoolean(USE_TAGS, "use tags for creating interface and controller classnames"));
+        cliOptions.add(CliOption.newBoolean(SPRING_INJECT_API_SERVICE, "Rely on spring injection to configure and provide the API's service delegate"));
     }
 
     @Override
@@ -97,6 +100,11 @@ public class JavaJerseyServerCodegen extends AbstractJavaJAXRSServerCodegen {
         if (additionalProperties.containsKey(USE_TAGS)) {
             this.setUseTags(Boolean.valueOf(additionalProperties.get(USE_TAGS).toString()));
         }
+
+        if (additionalProperties.containsKey(SPRING_INJECT_API_SERVICE)) {
+            this.setSpringInjectApiService(Boolean.valueOf(additionalProperties.get(SPRING_INJECT_API_SERVICE).toString()));
+        }
+        additionalProperties.put(SPRING_INJECT_API_SERVICE, springInjectApiService);
 
         if ("joda".equals(dateLibrary)) {
             supportingFiles.add(new SupportingFile("JodaDateTimeProvider.mustache", (sourceFolder + '/' + apiPackage).replace(".", "/"), "JodaDateTimeProvider.java"));
@@ -176,6 +184,14 @@ public class JavaJerseyServerCodegen extends AbstractJavaJAXRSServerCodegen {
 
     public void setUseTags(boolean useTags) {
         this.useTags = useTags;
+    }
+
+    protected void setSpringInjectApiService(boolean enabled) {
+        this.springInjectApiService = enabled;
+    }
+
+    protected boolean isSpringInjectApiService() {
+        return this.springInjectApiService;
     }
 
 }
